@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<script type="text/javascript" src="js/jquery-1.11.1.min.js"></script>
+<script type="text/javascript" src="js/jquery.qrcode.min.js"></script>
+<title>QR二维码小工具</title>
+</head>
+<body>
+
+<div style="position:absolute;top:16px;left:200px;width:400px;height:600px;overflow:auto;">
+	<label for="length">尺寸</label>
+	<br>
+	<select id="length"  name="length">
+		<option value="64" >64</option>
+		<option value="96">96</option>
+		<option value="128" selected="selected">128</option>
+		<option value="160">160</option>
+		<option value="192">192</option>
+		<option value="224">224</option>
+		<option value="256">256</option>
+	</select>
+	<br>
+	<br>
+	<label for="version">版本号(1-40)</label>
+	<br>
+	<input id="version" type="text" value="7" />
+	<br>
+	<br>
+	<label for="code">内容</label><br>
+	<textarea id="code" rows="4" cols="20">欢迎使用QR码生成工具</textarea>
+	<br>
+	<br>
+	<label for="fColor">前景色</label>
+	<br>
+	<select id="fColor"  name="fColor">
+		<option value="#000000" selected="selected">黑色</option>
+		<option value="#FF0000" style="color:#FF0000;">红色</option>
+		<option value="#00FF00" style="color:#00FF00;">绿色</option>
+		<option value="#0000FF" style="color:#0000FF;">蓝色</option>
+	</select>
+	<br>
+	<br>
+	<input type="button" value="生成QR码" onclick="showQRcode()" />
+	<br>
+	<br>
+	<div id="qrcode"></div>
+</div>
+
+<div style="position:absolute;top:16px;left:600px;width:400px;height:600px;overflow:auto;color:#FF0000;">
+	说明
+	<dl>
+		<dt>尺寸</dt>
+		<dd>小的尺寸对应小的版本号</dd>
+		<dt>版本号</dt>
+		<dd>版本号的范围是1-40，如果不在这个范围内将有程序自动设置。</dd>
+		<dt>内容</dt>
+		<dd>内容随版本号的增加而相应增加。如果版本号较小，内容较多可能无法生成QR码。</dd>
+		<dt>前景色</dt>
+		<dd>前景色有黑色、红色、绿色和蓝色可选。</dd>
+		<dt>容错级别</dt>
+		<dd>默认为H级</dd>
+		<dt>已经用360安全扫码测试过</dt>
+		<dd></dd>
+	</dl>
+</div>
+
+</body>
+<script type="text/javascript">
+function utf16to8(str) {
+    var out, i, len, c;
+    out = "";
+    len = str.length;
+    for(i = 0; i < len; i++) {
+	    c = str.charCodeAt(i);
+	    if ((c >= 0x0001) && (c <= 0x007F)) {
+	        out += str.charAt(i);
+	    } else if (c > 0x07FF) {
+	        out += String.fromCharCode(0xE0 | ((c >> 12) & 0x0F));
+	        out += String.fromCharCode(0x80 | ((c >>  6) & 0x3F));
+	        out += String.fromCharCode(0x80 | ((c >>  0) & 0x3F));
+	    } else {
+	        out += String.fromCharCode(0xC0 | ((c >>  6) & 0x1F));
+	        out += String.fromCharCode(0x80 | ((c >>  0) & 0x3F));
+	    }
+    }
+    return out; 
+}
+
+function showQRcode(){
+	$("#qrcode").html("");
+	
+	var length = $('#length').val();
+	length = parseInt(length);
+	if(isNaN(length)){
+		length = 256;
+	} else {
+		if(length > 256 || length < 64)
+			length = 256;
+	}
+	
+	var version = $('#version').val();
+	version = parseInt(version);
+	if(isNaN(version)){
+		version = -1;
+	} else {
+		if(version > 40 || version < 1)
+			version = -1;
+	}
+	
+	jQuery('#qrcode').qrcode({
+		text : utf16to8($('#code').val()),
+		typeNumber : version,
+		width : length,
+		height : length,
+		foreground : $('#fColor').val()
+	});
+}
+
+jQuery(function(){
+	showQRcode();
+})
+</script>
+</html>
